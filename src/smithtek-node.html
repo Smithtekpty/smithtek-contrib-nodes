@@ -1,0 +1,197 @@
+
+<script type="text/x-red" data-help-name="smithtek-node">
+    <p>Provides configuration options for a SmithTek Node.</p>
+</script>
+
+<script type="text/x-red" data-template-name="smithtek-node">
+
+
+
+    <div class="form-row">
+        <label for="node-config-input-address"><i class="fa fa-tag"></i> <span >Device address:</span></label>
+        <input type="text" id="node-config-input-address" data-i18n="[placeholder]node-red:smithteknode.label.address">
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-address"><i class="fa fa-tag"></i> <span >Pattern:</span></label>
+        <input type="text" id="node-config-input-pattern" >
+    </div>
+
+
+    <div class="form-row">
+        <label for="node-config-input-serialport"><i class="fa fa-random"></i> <span >Serial Port</span>:</label>
+        <input type="text" id="node-config-input-serialport" style="width:66%;" placeholder="for example: /dev/ttyUSB0">
+        <a id="node-config-lookup-serial" class="btn"><i id="node-config-lookup-serial-icon" class="fa fa-search"></i></a>
+    </div>
+    <div class="form-row">
+        <table width="100%"><tr>
+            <td width="100px"><i class="fa fa-wrench"></i> <span >Settings</span></td>
+            <td width="110px" >Baud Rate</td>
+            <td width="70px" >Data Bits</td>
+            <td width="80px" >Parity</td>
+            <td width="70px" >Stop Bits</td>
+        </tr><tr><td>&nbsp;</td>
+        <td>
+            <input type="text" id="node-config-input-serialbaud" style="width:92%">
+        </td><td>
+        <select type="text" id="node-config-input-databits" style="width:90%;">
+            <option value="8">8</option>
+            <option value="7">7</option>
+            <option value="6">6</option>
+            <option value="5">5</option>
+        </select>
+        </td><td>
+        <select type="text" id="node-config-input-parity" style="width:90%;">
+            <option value="none" >None</option>
+            <option value="even" >Even</option>
+            <option value="mark" >Mark</option>
+            <option value="odd" >Odd</option>
+            <option value="space" >Space</option>
+        </select>
+        </td><td>
+        <select type="text" id="node-config-input-stopbits" style="width:90%;">
+            <option value="2">2</option>
+            <option value="1">1</option>
+        </select>
+        </td></tr></table>
+    </div>
+    <br/>
+    <div id="node-config-addchar">
+        <div class="form-row">
+            <label><i class="fa fa-exchange"></i> <span data-i18n="serial.label.request">Request</span></label>
+        </div>
+        <div class="form-row" style="padding-left:10px;">
+            <span data-i18n="serial.label.responsetimeout">Default response timeout</span>
+            <input type="text" id="node-config-input-responsetimeout" style="width:60px;">
+            <span data-i18n="serial.label.ms">ms</span>
+        </div>
+    </div>
+    <div class="form-tips" id="tip-responsetimeout" hidden><span data-i18n="serial.tip.responsetimeout">Tip: The default response timeout can be overridden by setting msg.timeout.</span></div>
+
+    <div class="form-tips" id="tip-timeout" hidden><span data-i18n="serial.tip.timeout">Tip: In timeout mode timeout starts from arrival of first character.</span></div>
+    <div class="form-tips" id="tip-silent" hidden><span data-i18n="serial.tip.silent">Tip: In line-silent mode timeout is restarted upon arrival of any character (i.e. inter-byte timeout).</span></div>
+</script>
+
+
+<script type="text/javascript">
+  RED.nodes.registerType('smithtek-node',{
+    category: 'config',
+    defaults: {
+
+      // test
+      address: {value: "0000",required:true},
+      pattern: {value: "",required:true},
+      //name: {value:""},
+      serialport: {value:"",required:true},
+      serialbaud: {value:"57600",required:true,validate:RED.validators.number()},
+      databits: {value:8,required:true},
+      parity: {value:"none",required:true},
+      stopbits: {value:1,required:true},
+      newline: {value:"\\n"},
+      bin: {value:"false"},
+      out: {value:"char"},
+      addchar: {value:false},
+      responsetimeout: {value: 10000}
+    },
+    label: function() {
+      this.serialbaud = this.serialbaud || 57600;
+      this.databits = this.databits || 8;
+      this.parity = this.parity || "none";
+      this.stopbits = this.stopbits || 1;
+      return this.serialport+":"+this.serialbaud+"-"+this.databits+this.parity.charAt(0).toUpperCase()+this.stopbits;
+    },
+    oneditprepare: function() {
+      var previous = null;
+      var blist = [
+        {value:"115200",label:"115200",hasValue:false},
+        {value:"57600",label:"57600",hasValue:false},
+        {value:"38400",label:"38400",hasValue:false},
+        {value:"19200",label:"19200",hasValue:false},
+        {value:"9600",label:"9600",hasValue:false},
+        {value:"4800",label:"4800",hasValue:false},
+        {value:"2400",label:"2400",hasValue:false},
+        {value:"1200",label:"1200",hasValue:false},
+        {value:"600",label:"600",hasValue:false},
+        {value:"300",label:"300",hasValue:false},
+        {label:"other",value:"other",icon:"red/images/typedInput/09.png",validate:/^[0-9]*$/}
+      ];
+      var serialbaudType = "custom";
+      for (var i in blist) {
+        if (this.serialbaud == blist[i].value) {
+          serialbaudType = this.serialbaud;
+        }
+      }
+      $("#node-config-input-serialbaud").typedInput({
+        default: this.serialbaud,
+        types:blist
+      });
+      $("#node-config-input-out").on('focus', function () { previous = this.value; }).change(function() {
+        if (previous == null) { previous = $("#node-config-input-out").val(); }
+        if ($("#node-config-input-out").val() == "char") {
+          if (previous != "char") { $("#node-config-input-newline").val("\\n"); }
+          $("#node-units").text("");
+          $("#node-config-addchar").show();
+          $("#tip-split").show();
+          $("#tip-timeout").hide();
+          $("#tip-silent").hide();
+        }
+        else if ($("#node-config-input-out").val() == "time") {
+          if (previous != "time") { $("#node-config-input-newline").val("0"); }
+          $("#node-units").text("ms");
+          $("#node-config-addchar").hide();
+          $("#node-config-input-addchar").val("false");
+          $("#tip-split").hide();
+          $("#tip-timeout").show();
+          $("#tip-silent").hide();
+        }
+        else if ($("#node-config-input-out").val() == "interbyte") {
+          if (previous != "interbyte") { $("#node-config-input-newline").val("0"); }
+          $("#node-units").text("ms");
+          $("#node-config-addchar").hide();
+          $("#node-config-input-addchar").val("false");
+          $("#tip-split").hide();
+          $("#tip-timeout").hide();
+          $("#tip-silent").show();
+        }
+        else {
+          if (previous != "count") { $("#node-config-input-newline").val(""); }
+          $("#node-units").text("chars");
+          $("#node-config-addchar").hide();
+          $("#node-config-input-addchar").val("false");
+          $("#tip-split").hide();
+          $("#tip-timeout").hide();
+          $("#tip-silent").hide();
+        }
+      });
+      $("#node-config-input-responsetimeout").on('focus', function () { $("#tip-responsetimeout").show(); });
+      try {
+        $("#node-config-input-serialport").autocomplete( "destroy" );
+      } catch(err) {
+      }
+      $("#node-config-lookup-serial").click(function() {
+        $("#node-config-lookup-serial").addClass('disabled');
+        $.getJSON('serialports',function(data) {
+          $("#node-config-lookup-serial").removeClass('disabled');
+          var ports = [];
+          $.each(data, function(i, port) {
+            ports.push(port.comName);
+          });
+          $("#node-config-input-serialport").autocomplete({
+            source:ports,
+            minLength:0,
+            close: function( event, ui ) {
+              $("#node-config-input-serialport").autocomplete( "destroy" );
+            }
+          }).autocomplete("search","");
+        });
+      });
+    },
+    oneditsave: function() {
+      var mytype = $("#node-config-input-serialbaud").typedInput('type');
+      if (mytype !== "other") {
+        $("#node-config-input-serialbaud").typedInput('value',mytype);
+      }
+      this.serialbaud = $("#node-config-input-serialbaud").typedInput('value');
+    }
+  });
+</script>
