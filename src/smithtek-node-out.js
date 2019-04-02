@@ -69,7 +69,7 @@ module.exports = function(RED) {
             if(!node.piped) {
               node.piped = true;
               node.port.links++;
-              node.port.serial.pipe(node.data_processor);
+              node.data_processor.pipe(node.port.serial);
               node.status({fill: "green", shape: "dot", text: "node-red:common.status.connected"});
             }
 
