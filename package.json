@@ -12,7 +12,7 @@
   },
   "node-red": {
     "nodes": {
-      "smithtek-out": "src/smithtek-node-out.js",
+      "smithtek-node-out-single": "src/smithtek-node-out-single.js",
       "smithtek-node-in-parallel": "src/smithtek-node-in-parallel.js"
     }
   },
