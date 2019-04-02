@@ -15,7 +15,10 @@
       "smithtek-raw-out": "src/smithtek-node-raw-out.js",
       "smithtek-raw-in": "src/smithtek-node-raw-in.js",
       "smithtek-serialport": "src/smithtek-serial.js",
-      "smithtek-parser": "src/smithtek-parser.js"
+      "smithtek-parser": "src/smithtek-parser.js",
+      "smithtek-serializer": "src/smithtek-serializer.js",
+      "smithtek-parser-parallel": "src/smithtek-parser-parallel.js",
+      "smithtek-in": "src/smithtek-node-in.js"
     }
   },
   "keywords": [

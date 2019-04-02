@@ -3,7 +3,7 @@ const Parser = require("./lib/packet-parser");
 module.exports = function(RED) {
   "use strict";
 
-  function SmithtekParser(n) {
+  function SmithtekParserParallel(n) {
     RED.nodes.createNode(this,n);
     var node = this;
 
@@ -27,9 +27,16 @@ module.exports = function(RED) {
       if(!Buffer.isBuffer(msg.payload)) {
         return;
       }
-      node.send({"payload": parser.parse(msg.payload)});
+      // node.send({"payload": parser.parse(msg.payload)});
+      let res = parser.parse(msg.payload);
+      let ret = [];
+
+      for(let i =0; i< format.length; i++) {
+        ret.push({payload: res[format[i].key]});
+      }
+       node.send(ret);
     });
   }
-  RED.nodes.registerType("SmithTek Parser",SmithtekParser);
+  RED.nodes.registerType("SmithTek Parser Parallel",SmithtekParserParallel);
 
 }
