@@ -1,11 +1,10 @@
-// "use strict";
+"use strict";
+
 let PacketCreatorStream = require("./lib/packet-creator-stream");
-
-
 
 module.exports = function(RED) {
   "use strict";
-  function SmithtekRawOut(n) {
+  function SmithtekOut(n) {
 
     RED.nodes.createNode(this,n);
     var node = this;
@@ -15,34 +14,36 @@ module.exports = function(RED) {
     // check incoming values
     var header = Buffer.from(n.header,'hex');
 
-    n.delay = parseInt(n.delay,10);
-    if(isNaN(n.delay) || n.delay<0) {
-      this.error(RED._("smithtek.errors.invalid-delay"));
-      node.status({fill:"red",shape:"ring",text:"node-red:common.status.not-connected"});
-      return;
-    }
-
-
-    n.repeats = parseInt(n.repeats,10);
-    if(isNaN(n.repeats)) {
-      this.error(RED._("smithtek.errors.invalid-repeats"));
-      node.status({fill:"red",shape:"ring",text:"node-red:common.status.not-connected"});
-      return;
-    }
-
-    n.size = parseInt(n.size,10);
-    if(isNaN(n.size) || n.size<0) {
-      this.error(RED._("smithtek.errors.invalid-size"));
-      node.status({fill:"red",shape:"ring",text:"node-red:common.status.not-connected"});
-      return;
-    }
-
+    // n.delay = parseInt(n.delay,10);
+    // if(isNaN(n.delay) || n.delay<0) {
+    //   this.error(RED._("smithtek.errors.invalid-delay"));
+    //   node.status({fill:"red",shape:"ring",text:"node-red:common.status.not-connected"});
+    //   return;
+    // }
+    //
+    //
+    // n.repeats = parseInt(n.repeats,10);
+    // if(isNaN(n.repeats)) {
+    //   this.error(RED._("smithtek.errors.invalid-repeats"));
+    //   node.status({fill:"red",shape:"ring",text:"node-red:common.status.not-connected"});
+    //   return;
+    // }
+    //
+    // n.size = parseInt(n.size,10);
+    // if(isNaN(n.size) || n.size<0) {
+    //   this.error(RED._("smithtek.errors.invalid-size"));
+    //   node.status({fill:"red",shape:"ring",text:"node-red:common.status.not-connected"});
+    //   return;
+    // }
+    n.delay = 20;
+    n.size = 1;
+    n.repeats = 2;
+    n.crc = true;
 
     var header_array = [];
     for (var i = 0; i< n.repeats; i++) {
       header_array.push(header);
     }
-
 
     this.data_processor = new PacketCreatorStream({
       // bufferSize: (100 * 1024),   // start at 100 kilobytes.
@@ -81,7 +82,7 @@ module.exports = function(RED) {
 
       node.on("input",function(msg) {
         if (!msg.hasOwnProperty("payload")) { return; } // do nothing unless we have a payload
-        node.data_processor.put(msg.payload);
+        node.data_processor.put((msg.payload?1:0));
         // var payload = node.port.encodePayload(msg.payload);
         // node.port.write(payload,function(err,res) {
         //   if (err) {
@@ -132,6 +133,6 @@ module.exports = function(RED) {
 
 
 
-  RED.nodes.registerType("SmithTek Raw Out",SmithtekRawOut);
+  RED.nodes.registerType("SmithTek Out",SmithtekOut);
 
 }

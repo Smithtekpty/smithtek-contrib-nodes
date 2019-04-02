@@ -1,34 +1,15 @@
-<script type="text/x-red" data-template-name="SmithTek Raw Out">
-    <div class="form-row node-input-smithtek-node-raw-out">
+<script type="text/x-red" data-template-name="SmithTek Out">
+    <div class="form-row node-input-smithtek-node-out">
         <label for="node-input-serial"><i class="fa fa-random"></i> <span data-i18n="smithtek.label.serial"></span></label>
         <input type="text" id="node-input-serial">
     </div>
     <div class="form-row">
         <label><i class="fa fa-sign-in"></i> Packet</label>
     </div>
-    <div>
-    <table class="form-row">
-    <tr><th><label for="node-input-header"> Header(hex)</label></th><th><label for="node-input-repeats"> Repeat</label></th></tr>
-    <tr><td>0x<input type="text" id="node-input-header" /></td><td><input type="text" id="node-input-repeats" /></td></tr>
-    </table>
+    <div class="form-row node-input-header">
+        <label for="node-input-header"> Header(hex) 0x</label>
+        <input type="text" id="node-input-header" />
     </div>
-
-    <div class="form-row ">
-    <table>
-    <tr>
-        <th><label for="node-input-size"> packet length</label></th>
-        <th><label for="node-input-serial">CRC</label></th>
-        <th><label for="node-input-delay">delay</label></th>
-    </tr>
-    <tr>
-        <td><input type="text" id="node-input-size" /></td>
-        <td><input type="checkbox" id="node-input-crc" /></td>
-        <td><input type="text" id="node-input-delay" /></td>
-    </tr>
-    </table>
-    </div>
-
-
     <div class="form-row">
         <label><i class="fa fa-sign-in"></i> Block</label>
     </div>
@@ -39,16 +20,16 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="SmithTek Node out">
-    <p>Send raw packets to SmithTek node.</p>
+<script type="text/x-red" data-help-name="SmithTek Node Raw out">
+    <p>Send value to SmithTek node.</p>
 
 </script>
 
 <script type="text/javascript">
-  RED.nodes.registerType('SmithTek Raw Out',{
+  RED.nodes.registerType('SmithTek Out',{
     category: 'SmithTek',
     defaults: {
-      name: {value: "raw out"},
+      name: {value: "out"},
       serial: {type:"smithtek-serial-port",required:true},
       header: { value :""},
       repeats: { value : 1 , validate:RED.validators.number()},
@@ -62,6 +43,7 @@
     outputs:0,
     icon: "serial.png",
     label: function() {
+
       return this.name||this._("smithtek.label.noderawout");
     },
     labelStyle: function() {

@@ -19,6 +19,7 @@
       "smithtek-serializer": "src/smithtek-serializer.js",
       "smithtek-parser-parallel": "src/smithtek-parser-parallel.js",
       "smithtek-in": "src/smithtek-node-in.js",
+      "smithtek-out": "src/smithtek-node-out.js",
       "smithtek-node-in-parallel": "src/smithtek-node-in-parallel.js"
     }
   },
