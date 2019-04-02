@@ -1,4 +1,4 @@
-<script type="text/x-red" data-template-name="SmithTek Out">
+<script type="text/x-red" data-template-name="SmithTek Out Single">
     <div class="form-row node-input-smithtek-node-out">
         <label for="node-input-serial"><i class="fa fa-random"></i> <span data-i18n="smithtek.label.serial"></span></label>
         <input type="text" id="node-input-serial">
@@ -20,13 +20,13 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="SmithTek Out">
+<script type="text/x-red" data-help-name="SmithTek Node Out Single">
     <p>Send value to SmithTek node.</p>
 
 </script>
 
 <script type="text/javascript">
-  RED.nodes.registerType('SmithTek Out',{
+  RED.nodes.registerType('SmithTek Out Single',{
     category: 'SmithTek',
     defaults: {
       name: {value: "out"},
