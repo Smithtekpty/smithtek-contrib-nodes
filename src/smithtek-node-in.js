@@ -25,17 +25,45 @@ module.exports = function(RED) {
 
     n.timeout = 20;
 
-    let format = [
-      {"type": "int32_t", "key": "v1"},
-      {"type": "PacketDigitalBinaryElement", "key": "b1"},
-      {"type": "PacketDigitalBinaryElement", "key": "b2"},
-      {"type": "PacketMarkerBinaryElement", "key": "m1",  "value": [1,2,3,4,5,255,255]},
-      {"type": "float", "key": "f1" },
-      {"type": "PacketDigitalBinaryElement", "key": "b3"},
-      {"type": "TColor", "key": "color1"},
-      {"type": "TRGBWColor", "key": "TRGBWColor1"},
-      {"type": "TDateTime", "key": "time1"}
-    ];
+    let format =
+    //     [
+    //   {"type": "int32_t", "key": "v1"},
+    //   {"type": "PacketDigitalBinaryElement", "key": "b1"},
+    //   {"type": "PacketDigitalBinaryElement", "key": "b2"},
+    //   {"type": "PacketMarkerBinaryElement", "key": "m1",  "value": [1,2,3,4,5,255,255]},
+    //   {"type": "float", "key": "f1" },
+    //   {"type": "PacketDigitalBinaryElement", "key": "b3"},
+    //   {"type": "TColor", "key": "color1"},
+    //   {"type": "TRGBWColor", "key": "TRGBWColor1"},
+    //   {"type": "TDateTime", "key": "time1"}
+    // ]
+
+            [
+            {"type": "float", "key": "gps_lat", "label": "GPS Lat"},
+                {"type": "float", "key": "gps_lon", "label": "GPS Lon"},
+                {"type": "float", "key": "batt_voltage", "label": "Battary Voltage"},
+                {"type": "float", "key": "analog_in_1", "label": "Analog input 1"},
+                {"type": "float", "key": "analog_in_2", "label": "Analog input 2"},
+                {"type": "float", "key": "analog_in_3", "label": "Analog input 3"},
+                {"type": "float", "key": "analog_in_4", "label": "Analog input 4"},
+                {"type": "float", "key": "analog_in_5", "label": "Analog input 5"},
+                {"type": "float", "key": "analog_in_6", "label": "Analog input 6"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_input_1", "label": "Digital input 1"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_input_2", "label": "Digital input 2"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_input_3", "label": "Digital input 3"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_input_4", "label": "Digital input 4"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_input_5", "label": "Digital input 5"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_input_6", "label": "Digital input 6"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_output_1", "label": "Digital output 1"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_output_2", "label": "Digital output 2"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_output_3", "label": "Digital output 3"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_output_6", "label": "Digital output 4"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_output_5", "label": "Digital output 5"},
+                {"type": "PacketDigitalBinaryElement", "key": "digital_output_6", "label": "Digital output 6"},
+                {"type": "float", "key": "pulse_meter", "label": "Pulse Meter"}
+            ]
+
+    ;
 
 
     let parser = new Parser(format);
