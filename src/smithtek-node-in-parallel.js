@@ -16,7 +16,7 @@ module.exports = function(RED) {
 
     n.repeats = 2;
     n.crc = 1;
-    n.timeout = 20;
+    n.timeout = 700;
 
     this.format =
         // [
