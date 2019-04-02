@@ -32,7 +32,6 @@ module.exports = function(RED) {
       chunkSize: n.size
     });
 
-
     this.serialConfig = RED.nodes.getNode(this.serial);
 
     if (this.serialConfig) {
@@ -56,9 +55,6 @@ module.exports = function(RED) {
         }
       }
 
-
-
-
       node.on("input",function(msg) {
         if (!msg.hasOwnProperty("payload")) { return; } // do nothing unless we have a payload
         node.data_processor.put((msg.payload?1:0));
@@ -70,7 +66,6 @@ module.exports = function(RED) {
         //   }
         // });
       });
-
 
 
       node.port.on('ready', function() {
@@ -104,13 +99,9 @@ module.exports = function(RED) {
       else {
         done();
       }
-
-
     });
 
   }
-
-
 
   RED.nodes.registerType("SmithTek Out Single",SmithtekOutSingle);
 
