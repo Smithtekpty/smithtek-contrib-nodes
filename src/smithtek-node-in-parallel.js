@@ -34,7 +34,7 @@ module.exports = function(RED) {
         [
           {"type": "float", "key": "gps_lat", "label": "GPS Lat"},
           {"type": "float", "key": "gps_lon", "label": "GPS Lon"},
-          {"type": "float", "key": "batt_voltage", "label": "Battary Voltage"},
+          {"type": "float", "key": "batt_voltage", "label": "Battery Voltage"},
           {"type": "float", "key": "analog_in_1", "label": "Analog input 1"},
           {"type": "float", "key": "analog_in_2", "label": "Analog input 2"},
           {"type": "float", "key": "analog_in_3", "label": "Analog input 3"},
@@ -63,6 +63,7 @@ module.exports = function(RED) {
 
     let parser = new Parser(this.format);
     n.size = parser.packet_size;
+    console.log("Size:", n.size);
 
     var header_array = [];
     for (var i = 0; i< n.repeats; i++) {
