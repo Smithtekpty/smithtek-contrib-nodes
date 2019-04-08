@@ -34,7 +34,7 @@ module.exports = function(RED) {
         [
           {"type": "float", "key": "gps_lat", "label": "GPS Lat"},
           {"type": "float", "key": "gps_lon", "label": "GPS Lon"},
-          {"type": "float", "key": "batt_voltage", "label": "Battary Voltage"},
+          {"type": "float", "key": "batt_voltage", "label": "Battery Voltage"},
           {"type": "float", "key": "analog_in_1", "label": "Analog input 1"},
           {"type": "float", "key": "analog_in_2", "label": "Analog input 2"},
           {"type": "float", "key": "analog_in_3", "label": "Analog input 3"},
@@ -50,7 +50,7 @@ module.exports = function(RED) {
           {"type": "PacketDigitalBinaryElement", "key": "digital_output_1", "label": "Digital output 1"},
           {"type": "PacketDigitalBinaryElement", "key": "digital_output_2", "label": "Digital output 2"},
           {"type": "PacketDigitalBinaryElement", "key": "digital_output_3", "label": "Digital output 3"},
-          {"type": "PacketDigitalBinaryElement", "key": "digital_output_6", "label": "Digital output 4"},
+          {"type": "PacketDigitalBinaryElement", "key": "digital_output_4", "label": "Digital output 4"},
           {"type": "PacketDigitalBinaryElement", "key": "digital_output_5", "label": "Digital output 5"},
           {"type": "PacketDigitalBinaryElement", "key": "digital_output_6", "label": "Digital output 6"},
           {"type": "float", "key": "pulse_meter", "label": "Pulse Meter"}
@@ -79,10 +79,17 @@ module.exports = function(RED) {
 
     });
 
-    this.data_processor.on('data', (data) => {
-      // node.send({"payload": data});
-      node.send({"payload": parser.parse(data)});
-    });
+    this.data_processor.on('data', (function(format) { return function(data) {
+
+
+        let res = parser.parse(data);
+        let ret = [];
+
+        for(let i =0; i< format.length; i++) {
+            ret.push({payload: res[format[i].key]});
+        }
+        node.send(ret);
+    }})(this.format));
 
 
     this.serialConfig = RED.nodes.getNode(this.serial);

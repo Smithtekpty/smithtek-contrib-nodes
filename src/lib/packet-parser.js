@@ -3,12 +3,11 @@ var BinaryParser = require("binary-parser").Parser;
 
 //bit field sequence longer than 4-bytes is not supported.
 
-
-
 module.exports = function(format) {
 "use strict";
-  let parser = new BinaryParser()
-    .endianess("little");
+  let parser = new BinaryParser();
+
+  parser.endianess('little');
 
   parser.moment = moment;
   parser.packet_size = 0;
@@ -17,7 +16,7 @@ module.exports = function(format) {
 
   for(let i =0; i< format.length; i++) {
 
-    if(( format[i].type != "PacketDigitalBinaryElement") && (bit_length != 0)) {
+    if(( format[i].type != "PacketDigitalBinaryElement") && (bit_length != 0)  ) {
         parser.packet_size += Math.ceil(bit_length/8);
         bit_length =0;
     }
@@ -142,8 +141,5 @@ module.exports = function(format) {
     parser.packet_size += Math.ceil(bit_length/8);
     bit_length =0;
   }
-
-
   return parser;
-
 }

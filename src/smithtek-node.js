@@ -42,15 +42,15 @@ module.exports = function(RED) {
         //   "count" : a msg will be sent after .newline characters
         // if we use "count", we already know how big the buffer will be
         var bufSize = spliton == "count" ? Number(newline): bufMaxSize;
-        var buf = new Buffer(bufSize);
+        var buf = Buffer.alloc(bufSize);
 
         var splitc; // split character
         // Parse the split character onto a 1-char buffer we can immediately compare against
         if (newline.substr(0,2) == "0x") {
-          splitc = new Buffer([parseInt(newline)]);
+          splitc = Buffer.from([parseInt(newline)]);
         }
         else {
-          splitc = new Buffer(newline.replace("\\n","\n").replace("\\r","\r").replace("\\t","\t").replace("\\e","\e").replace("\\f","\f").replace("\\0","\0")); // jshint ignore:line
+          splitc = Buffer.from(newline.replace("\\n","\n").replace("\\r","\r").replace("\\t","\t").replace("\\e","\e").replace("\\f","\f").replace("\\0","\0")); // jshint ignore:line
         }
 
         connections[id] = (function() {
@@ -197,7 +197,7 @@ module.exports = function(RED) {
                 var c = d[z];
                 // handle the trivial case first -- single char buffer
                 if ((newline === 0)||(newline === "")) {
-                  emitData(new Buffer([c]));
+                  emitData(Buffer.from([c]));
                   continue;
                 }
 

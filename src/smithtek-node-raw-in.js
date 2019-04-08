@@ -311,7 +311,6 @@ module.exports = function(RED) {
       }
 
       if (this.serialConfig && node.port.links<=0) {
-        console.log('Taras closing!!!');
         serialPool.close(this.serialConfig.serialport, done);
       }
       else {

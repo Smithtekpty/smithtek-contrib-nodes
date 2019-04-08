@@ -93,7 +93,6 @@
       this.noerr = 0;
       $("#node-input-noerr").val(0);
       for (var k=0; k < annot.length; k++) {
-        //console.log(annot[k].type,":",annot[k].text, "on line", annot[k].row);
         if (annot[k].type === "error") {
           $("#node-input-noerr").val(annot.length);
           this.noerr = annot.length;
