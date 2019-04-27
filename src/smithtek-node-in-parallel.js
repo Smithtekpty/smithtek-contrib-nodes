@@ -9,7 +9,6 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,n);
         var node = this;
         this.piped = false;
-
         this.serial = n.serial;
         // check incoming values
         var header = Buffer.from(n.header,'hex');
@@ -19,18 +18,6 @@ module.exports = function(RED) {
         n.timeout = 20;
 
         this.format =
-            // [
-            //   {"type": "int32_t", "key": "v1"},
-            //   {"type": "PacketDigitalBinaryElement", "key": "b1", "label":"Flag 1"},
-            //   {"type": "PacketDigitalBinaryElement", "key": "b2"},
-            //   {"type": "PacketMarkerBinaryElement", "key": "m1", "len":7, "value": [1,2,3,4,5,255,255]},
-            //   {"type": "float", "key": "f1" },
-            //   {"type": "PacketDigitalBinaryElement", "key": "b3"},
-            //   {"type": "TColor", "key": "color1"},
-            //   {"type": "TRGBWColor", "key": "color2"},
-            //   {"type": "TDateTime", "key": "time1"}
-            // ]
-
             [
                 {"type": "float", "key": "gps_lat", "label": "GPS Lat"},
                 {"type": "float", "key": "gps_lon", "label": "GPS Lon"},
@@ -58,9 +45,6 @@ module.exports = function(RED) {
 
         ;
 
-
-
-
         let parser = new Parser(this.format);
         n.size = parser.packet_size;
 
@@ -81,7 +65,6 @@ module.exports = function(RED) {
 
         this.data_processor.on('data', (function(format) { return function(data) {
 
-
             let res = parser.parse(data);
             let ret = [];
 
@@ -94,13 +77,29 @@ module.exports = function(RED) {
 
         this.serialConfig = RED.nodes.getNode(this.serial);
 
+
+        this.readyFunction = function() {
+            if(!node.piped) {
+                node.piped = true;
+                node.port.links++;
+                node.port.serial.pipe(node.data_processor);
+                node.status({fill: "green", shape: "dot", text: "node-red:common.status.connected"});
+            }
+        };
+
+        this.closedFunction = function() {
+            node.status({fill:"red",shape:"ring",text:"node-red:common.status.not-connected"});
+        }
+
         if (this.serialConfig) {
-            node.port = this.serialConfig.serialPool.get(this.serialConfig.serialport,
+            node.port = this.serialConfig.serialPool.get(
+                this.serialConfig.serialport,
                 this.serialConfig.serialbaud,
                 this.serialConfig.databits,
                 this.serialConfig.parity,
                 this.serialConfig.stopbits,
-                this.serialConfig.newline);
+                this.serialConfig.newline
+            );
 
             if(node.port) {
                 if (node.port.serial) {
@@ -116,39 +115,34 @@ module.exports = function(RED) {
                 }
             }
 
-            node.port.on('ready', function() {
-                if(!node.piped) {
-                    node.piped = true;
-                    node.port.links++;
-                    node.port.serial.pipe(node.data_processor);
-                    node.status({fill: "green", shape: "dot", text: "node-red:common.status.connected"});
-                }
-            });
-            node.port.on('closed', function() {
-                node.status({fill:"red",shape:"ring",text:"node-red:common.status.not-connected"});
-            });
+            node.port.on('ready', this.readyFunction);
+            node.port.on('closed', this.closedFunction);
         }
         else {
             this.error(RED._("smithtek.errors.missing-conf"));
         }
 
+        this.prototype.close = function() {
+            console.log('node closed');
+            node.port.removeListener('ready', this.readyFunction);
+            node.port.removeListener('closed', this.closedFunction);
+
+        }
+
         this.on("close", function(done) {
             if(node.piped) {
                 node.port.links--;
-
                 node.port.serial.unpipe(node.data_processor);
                 node.piped = false;
             }
 
             if (this.serialConfig && node.port.links<=0) {
                 serialPool.close(this.serialConfig.serialport, done);
-            }
-            else {
+            } else {
                 done();
             }
         });
     }
     RED.nodes.registerType("SmithTek In Parallel",SmithtekInParallel);
-
 
 }

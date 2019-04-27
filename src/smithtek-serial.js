@@ -18,9 +18,8 @@ module.exports = function(RED) {
     "use strict";
     var settings = RED.settings;
     var events = require("events");
-    // var serialp = require("serialport");
     var SerialPort = require('serialport');
-    var serialp = require('serialport');
+    // var serialp = require('serialport');
 
     var bufMaxSize = 32768;  // Max serial buffer size, for inputs...
 
@@ -51,7 +50,7 @@ module.exports = function(RED) {
                 dataBits: databits,
                 parity: parity,
                 stopBits: stopbits,
-                parser: serialp.parsers.raw
+                parser: SerialPort.parsers.raw
               }, function(err, results) { if (err) { obj.serial.emit('error',err); } });
               obj.serial.on('error', function(err) {
                 RED.log.error("serial port "+port+" error "+err);
@@ -117,7 +116,7 @@ module.exports = function(RED) {
     function SerialPortNode(n) {
         RED.nodes.createNode(this,n);
         this.serialport = n.serialport;
-        this.newline = n.newline;
+        this.newline = n.newline ;
         this.addchar = n.addchar || "false";
         this.serialbaud = parseInt(n.serialbaud) || 57600;
         this.databits = parseInt(n.databits) || 8;
@@ -127,7 +126,7 @@ module.exports = function(RED) {
         this.out = n.out || "char";
         this.serialPool = serialPool;
     }
-    RED.nodes.registerType("smithtek-serial-port",SerialPortNode);
+    RED.nodes.registerType("smithtek-serial-port", SerialPortNode);
 
     function SerialOutNode(n) {
         RED.nodes.createNode(this,n);
@@ -197,8 +196,8 @@ module.exports = function(RED) {
             var node = this;
             node.tout = null;
             var buf;
-            if (node.serialConfig.out != "count") { buf = new Buffer(bufMaxSize); }
-            else { buf = new Buffer(Number(node.serialConfig.newline)); }
+            if (node.serialConfig.out != "count") { buf = new Buffer.alloc(bufMaxSize); }
+            else { buf = new Buffer.alloc(Number(node.serialConfig.newline)); }
             var i = 0;
             node.status({fill:"grey",shape:"dot",text:"unknown"});
             node.port = serialPool.get(this.serialConfig.serialport,
@@ -209,11 +208,13 @@ module.exports = function(RED) {
                 this.serialConfig.newline
             );
 
-            var splitc;
-            if (node.serialConfig.newline.substr(0,2) == "0x") {
-                splitc = new Buffer([parseInt(node.serialConfig.newline)]);
-            } else {
-                splitc = new Buffer(node.serialConfig.newline.replace("\\n","\n").replace("\\r","\r").replace("\\t","\t").replace("\\e","\e").replace("\\f","\f").replace("\\0","\0")); // jshint ignore:line
+            var splitc = "\n";
+            if(typeof node.serialConfig.newline === 'string' ) {
+                if (node.serialConfig.newline.substr(0, 2) == "0x") {
+                    splitc = new Buffer([parseInt(node.serialConfig.newline)]);
+                } else {
+                    splitc = new Buffer(node.serialConfig.newline.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t").replace("\\e", "\e").replace("\\f", "\f").replace("\\0", "\0")); // jshint ignore:line
+                }
             }
 
             this.port.on('data', function(msg) {
