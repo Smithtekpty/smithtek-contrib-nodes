@@ -45,6 +45,10 @@ module.exports = function(RED) {
 
         ;
 
+        this.format =
+            [
+                {"type": "float", "key": "gps_lat", "label": "GPS Lat"},
+            ];
         let parser = new Parser(this.format);
         n.size = parser.packet_size;
 
@@ -122,27 +126,40 @@ module.exports = function(RED) {
             this.error(RED._("smithtek.errors.missing-conf"));
         }
 
-        this.prototype.close = function() {
-            console.log('node closed');
-            node.port.removeListener('ready', this.readyFunction);
-            node.port.removeListener('closed', this.closedFunction);
 
-        }
-
-        this.on("close", function(done) {
-            if(node.piped) {
-                node.port.links--;
-                node.port.serial.unpipe(node.data_processor);
-                node.piped = false;
-            }
-
-            if (this.serialConfig && node.port.links<=0) {
-                serialPool.close(this.serialConfig.serialport, done);
-            } else {
-                done();
-            }
-        });
+        // this.on("close", function(done) {
+        //     if(node.piped) {
+        //         node.port.links--;
+        //         node.port.serial.unpipe(node.data_processor);
+        //         node.piped = false;
+        //     }
+        //
+        //     if (this.serialConfig && node.port.links<=0) {
+        //         serialPool.close(this.serialConfig.serialport, done);
+        //     } else {
+        //         done();
+        //     }
+        // });
     }
     RED.nodes.registerType("SmithTek In Parallel",SmithtekInParallel);
 
+    SmithtekInParallel.prototype.close = function() {
+        if (this.port) {
+            this.port.removeListener('ready', this.readyFunction);
+            this.port.removeListener('closed', this.closedFunction);
+        }
+
+        if(this.piped) {
+            this.port.links--;
+            this.port.serial.unpipe(this.data_processor);
+            this.piped = false;
+        }
+        if (this.serialConfig && this.port.links<=0) {
+            this.serialConfig.serialPool.close(this.serialConfig.serialport);
+
+        }
+        if (RED.settings.verbose) {
+            this.log(RED._("SmithtekInParallel.stopped"));
+        }
+    }
 }

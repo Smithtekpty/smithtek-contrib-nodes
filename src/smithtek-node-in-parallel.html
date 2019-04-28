@@ -90,7 +90,6 @@
       icon: "smithtek.png",
     label: function() {
       var SmithtekNodeInParallel = RED.nodes.node(this['smithtek-node-in-parallel']);
-      console.log("Get node:", SmithtekNodeInParallel);
       return this.name||(SmithtekNodeInParallel?SmithtekNodeInParallel.label().split(":")[0]:this._("smithtek.label.nodein"));
     },
     labelStyle: function() {

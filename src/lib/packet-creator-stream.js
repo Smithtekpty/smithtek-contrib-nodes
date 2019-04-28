@@ -19,8 +19,6 @@ var PacketCreatorStream = function(opts) {
     self.packetHeader = opts.header || '';
 
     if (opts.crc) {
-
-        console.log('Enable crc');
         this.crc_length = 1;
         this.crc = (buf) => {
             var xor = 0;
@@ -39,7 +37,7 @@ var PacketCreatorStream = function(opts) {
 
 
     var size = 0;
-    var buffer = new Buffer(initialSize);
+    var buffer = new Buffer.alloc(initialSize);
     var allowPush = false;
 
     var sendData = function() {
@@ -48,7 +46,7 @@ var PacketCreatorStream = function(opts) {
 
         if (amount > 0) {
             var chunk = null;
-            chunk = new Buffer(amount);
+            chunk = new Buffer.alloc(amount);
             buffer.copy(chunk, 0, 0, amount);
 
             sendMore = that.push(chunk) !== false;
@@ -93,7 +91,7 @@ var PacketCreatorStream = function(opts) {
         if((buffer.length - size) < incomingDataSize) {
             var factor = Math.ceil((incomingDataSize - (buffer.length - size)) / incrementAmount);
 
-            var newBuffer = new Buffer(buffer.length + (incrementAmount * factor));
+            var newBuffer = new Buffer.alloc(buffer.length + (incrementAmount * factor));
             buffer.copy(newBuffer, 0, 0, size);
             buffer = newBuffer;
         }

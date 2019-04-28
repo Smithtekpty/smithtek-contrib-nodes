@@ -1,5 +1,4 @@
 "use strict";
-
 let PacketCreatorStream = require("./lib/packet-creator-stream");
 
 module.exports = function(RED) {
@@ -58,13 +57,6 @@ module.exports = function(RED) {
       node.on("input",function(msg) {
         if (!msg.hasOwnProperty("payload")) { return; } // do nothing unless we have a payload
         node.data_processor.put((msg.payload?1:0));
-        // var payload = node.port.encodePayload(msg.payload);
-        // node.port.write(payload,function(err,res) {
-        //   if (err) {
-        //     var errmsg = err.toString().replace("Serialport","Serialport "+node.port.serial.path);
-        //     node.error(errmsg,msg);
-        //   }
-        // });
       });
 
 
@@ -84,25 +76,25 @@ module.exports = function(RED) {
       this.error(RED._("smithtek.errors.missing-conf"));
     }
 
-    this.on("close", function(done) {
-      if(node.piped) {
-        node.port.links--;
-
-        node.port.serial.unpipe(node.data_processor);
-        node.piped = false;
-      }
-
-      if (this.serialConfig && node.port.links<=0) {
-        console.log('Serial port closing!!!');
-        serialPool.close(this.serialConfig.serialport, done);
-      }
-      else {
-        done();
-      }
-    });
 
   }
 
   RED.nodes.registerType("SmithTek Out Single",SmithtekOutSingle);
 
+    SmithtekOutSingle.prototype.close = function() {
+
+        if(this.piped) {
+            this.port.links--;
+            this.port.serial.unpipe(this.data_processor);
+            this.piped = false;
+        }
+        if (this.serialConfig && this.port.links<=0) {
+            this.serialConfig.serialPool.close(this.serialConfig.serialport);
+
+        }
+        if (RED.settings.verbose) {
+            this.log(RED._("SmithtekOutSingle.stopped"));
+        }
+
+    }
 }
