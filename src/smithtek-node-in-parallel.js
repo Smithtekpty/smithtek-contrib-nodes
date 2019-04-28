@@ -45,10 +45,10 @@ module.exports = function(RED) {
 
         ;
 
-        this.format =
-            [
-                {"type": "float", "key": "gps_lat", "label": "GPS Lat"},
-            ];
+        // this.format =
+        //     [
+        //         {"type": "float", "key": "gps_lat", "label": "GPS Lat"},
+        //     ];
         let parser = new Parser(this.format);
         n.size = parser.packet_size;
 
